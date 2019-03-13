@@ -7,6 +7,10 @@ package de.mossgrabers.nativefiledialogs.linux;
 import de.mossgrabers.nativefiledialogs.FileFilter;
 import de.mossgrabers.nativefiledialogs.NativeFileDialogs;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import java.io.File;
 
 
@@ -32,6 +36,8 @@ public class NativeLinuxFileDialogs implements NativeFileDialogs
     @Override
     public File selectFile (final FileFilter... filters)
     {
+
+
         // TODO Auto-generated method stub
         return null;
     }
