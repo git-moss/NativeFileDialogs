@@ -5,6 +5,7 @@
 package de.mossgrabers.nativefiledialogs;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -17,10 +18,40 @@ public interface NativeFileDialogs
     /**
      * Display a dialog for selecting a fil, which should be opened.
      *
+     * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
+     */
+    File selectFile () throws IOException;
+
+
+    /**
+     * Display a dialog for selecting a fil, which should be opened.
+     *
      * @param filters Display only the files matching the given filters
      * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
      */
-    File selectFile (FileFilter... filters);
+    File selectFile (FileFilter... filters) throws IOException;
+
+
+    /**
+     * Display a dialog for selecting a fil, which should be opened.
+     *
+     * @param title The title to use for the folder, may be null
+     * @param filters Display only the files matching the given filters
+     * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
+     */
+    File selectFile (String title, FileFilter... filters) throws IOException;
+
+
+    /**
+     * Display a dialog for selecting a fil, which should be saved.
+     *
+     * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
+     */
+    File selectNewFile () throws IOException;
 
 
     /**
@@ -28,8 +59,29 @@ public interface NativeFileDialogs
      *
      * @param filters Display only the files matching the given filters
      * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
      */
-    File selectNewFile (FileFilter... filters);
+    File selectNewFile (FileFilter... filters) throws IOException;
+
+
+    /**
+     * Display a dialog for selecting a fil, which should be saved.
+     *
+     * @param title The title to use for the folder, may be null
+     * @param filters Display only the files matching the given filters
+     * @return The selected file or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
+     */
+    File selectNewFile (String title, FileFilter... filters) throws IOException;
+
+
+    /**
+     * Display a dialog to select a folder.
+     *
+     * @return The selected folder or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
+     */
+    File selectFolder () throws IOException;
 
 
     /**
@@ -37,6 +89,7 @@ public interface NativeFileDialogs
      *
      * @param title The title to use for the folder, may be null
      * @return The selected folder or null if the dialog was canceled
+     * @throws IOException A problem with the dialog appeared
      */
-    File selectFolder (String title);
+    File selectFolder (String title) throws IOException;
 }

@@ -5,6 +5,7 @@
 package de.mossgrabers.nativefiledialogs;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -27,7 +28,7 @@ public class OpenDialogs
         {
             dlgs = NativeFileDialogsFactory.create (null);
 
-            File selectFile = dlgs.selectFolder (null);
+            File selectFile = dlgs.selectFolder ();
             System.out.println (selectFile);
 
             selectFile = dlgs.selectFile ();
@@ -36,7 +37,7 @@ public class OpenDialogs
             selectFile = dlgs.selectNewFile ();
             System.out.println (selectFile);
         }
-        catch (final PlatformNotSupported ex)
+        catch (final PlatformNotSupported | IOException ex)
         {
             ex.printStackTrace ();
         }

@@ -4,8 +4,8 @@
 
 package de.mossgrabers.nativefiledialogs.windows;
 
+import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
-import de.mossgrabers.nativefiledialogs.NativeFileDialogs;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -15,6 +15,7 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -22,7 +23,7 @@ import java.io.File;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class NativeWindowsFileDialogs implements NativeFileDialogs
+public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
 {
     private static final int MAX_PATH_LENGTH = 4000;
 
@@ -46,17 +47,17 @@ public class NativeWindowsFileDialogs implements NativeFileDialogs
 
     /** {@inheritDoc} */
     @Override
-    public File selectFile (final FileFilter... filters)
+    public File selectFile (final String title, final FileFilter... filters) throws IOException
     {
-        return this.showDialog (true, filters);
+        return this.showDialog (true, title, filters);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public File selectNewFile (final FileFilter... filters)
+    public File selectNewFile (final String title, final FileFilter... filters) throws IOException
     {
-        return this.showDialog (false, filters);
+        return this.showDialog (false, title, filters);
     }
 
 
@@ -89,12 +90,14 @@ public class NativeWindowsFileDialogs implements NativeFileDialogs
      * Displays the file browser.
      *
      * @param open Whether to show the open dialog, if false save dialog is shown
-     * @param filters
+     * @param title The title for the dialog
+     * @param filters Display only the files matching the given filters
      * @return The selected directory or null if the dialog was canceled
+     * @throws IOException Could not create the dialog
      */
-    private File showDialog (final boolean open, final FileFilter [] filters)
+    private File showDialog (final boolean open, final String title, final FileFilter [] filters) throws IOException
     {
-        final Comdlg32.OpenFileName params = this.configureParameters (filters);
+        final Comdlg32.OpenFileName params = this.configureParameters (title, filters);
         if (open ? Comdlg32.GetOpenFileNameW (params) : Comdlg32.GetSaveFileNameW (params))
         {
             final File selectedFile = params.getSelectedFile ();
@@ -105,16 +108,19 @@ public class NativeWindowsFileDialogs implements NativeFileDialogs
         final int errCode = Comdlg32.CommDlgExtendedError ();
         // If the code is 0 the dialog was canceled
         if (errCode != 0)
-            throw new RuntimeException ("GetOpenFileName failed with error " + errCode);
+            throw new IOException ("GetOpenFileName failed with error " + errCode);
         return null;
     }
 
 
-    private Comdlg32.OpenFileName configureParameters (final FileFilter [] filters)
+    private Comdlg32.OpenFileName configureParameters (final String title, final FileFilter [] filters)
     {
         final Comdlg32.OpenFileName params = new Comdlg32.OpenFileName ();
         params.Flags = Comdlg32.OFN_EXPLORER | Comdlg32.OFN_NOCHANGEDIR | Comdlg32.OFN_HIDEREADONLY | Comdlg32.OFN_ENABLESIZING;
         params.hwndOwner = this.getParentWindow ();
+
+        if (title != null)
+            params.lpstrTitle = title;
 
         // lpstrFile contains the selection path after the dialog returns. It must be big enough for
         // the path to fit or GetOpenFileName returns an error (FNERR_BUFFERTOOSMALL). MAX_PATH is
@@ -126,13 +132,11 @@ public class NativeWindowsFileDialogs implements NativeFileDialogs
         params.lpstrFile = new Memory (bufferSize);
         params.lpstrFile.clear (bufferSize);
 
-        // nMaxFile
         // http://msdn.microsoft.com/en-us/library/ms646839.aspx:
         // "The size, in characters, of the buffer pointed to by lpstrFile. The buffer must be large
         // enough to store the path and file name string or strings, including the terminating NULL
-        // character."
-
-        // For the unicode version of the API the nMaxFile value must be 1/4 of the lpstrFile buffer
+        // character." For the unicode version of the API the nMaxFile value must be 1/4 of the
+        // lpstrFile buffer
         // size plus one for the terminating null byte.
         params.nMaxFile = bufferLength;
 

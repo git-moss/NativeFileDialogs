@@ -4,14 +4,11 @@
 
 package de.mossgrabers.nativefiledialogs.linux;
 
+import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
-import de.mossgrabers.nativefiledialogs.NativeFileDialogs;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -19,7 +16,7 @@ import java.io.File;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class NativeLinuxFileDialogs implements NativeFileDialogs
+public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
 {
     /**
      * Creates a new file dialog instance with the initial directory.
@@ -34,18 +31,7 @@ public class NativeLinuxFileDialogs implements NativeFileDialogs
 
     /** {@inheritDoc} */
     @Override
-    public File selectFile (final FileFilter... filters)
-    {
-
-
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public File selectNewFile (final FileFilter... filters)
+    public File selectFile (String title, FileFilter... filters) throws IOException
     {
         // TODO Auto-generated method stub
         return null;
@@ -54,7 +40,16 @@ public class NativeLinuxFileDialogs implements NativeFileDialogs
 
     /** {@inheritDoc} */
     @Override
-    public File selectFolder (final String title)
+    public File selectNewFile (String title, FileFilter... filters) throws IOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public File selectFolder (String title) throws IOException
     {
         // TODO Auto-generated method stub
         return null;

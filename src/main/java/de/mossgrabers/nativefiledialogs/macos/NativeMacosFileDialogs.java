@@ -4,13 +4,8 @@
 
 package de.mossgrabers.nativefiledialogs.macos;
 
+import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
-import de.mossgrabers.nativefiledialogs.NativeFileDialogs;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,8 +19,14 @@ import java.util.Arrays;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class NativeMacosFileDialogs implements NativeFileDialogs
+public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
 {
+    private static final String OPEN_START = "tell application \"Finder\"\nActivate\ntry\nPOSIX path of ( choose file name ";
+    private static final String OPEN_END   = ")\non error number -128\nend try\nend tell";
+
+    private File                currentDirectory;
+
+
     /**
      * Creates a new file dialog instance with the initial directory.
      *
@@ -33,99 +34,32 @@ public class NativeMacosFileDialogs implements NativeFileDialogs
      */
     public NativeMacosFileDialogs (final File currentDirectory)
     {
-        // TODO Auto-generated constructor stub
+        this.currentDirectory = currentDirectory;
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public File selectFile (final FileFilter... filters)
+    public File selectFile (final String title, final FileFilter... filters) throws IOException
     {
-      //  String applescriptCommand = "say \"Hello from Java\"\\n";
-        
-        Runtime runtime = Runtime.getRuntime();
-        
-        // an applescript command that is multiple lines long.
-        // just create a java string, and remember the newline characters.
-//        String applescriptCommand =  "tell app \"iTunes\"\n" + 
-//                                       "activate\n" +
-//                                       "set sound volume to 40\n" + 
-//                                       "set EQ enabled to true\n" +
-//                                       "play\n" +
-//                                     "end tell";
-        
-        String applescriptCommand = "tell application \"Finder\"\n" + 
-        "Activate\n"+
-        "try\n" +
-        "POSIX path of ( choose file name " +
-//        if ( aTitle && strlen(aTitle) )
-//        {
-//            strcat(lDialogString, "with prompt \"") ;
-//            strcat(lDialogString, aTitle) ;
-//            strcat(lDialogString, "\" ") ;
-//        }
-//        getPathWithoutFinalSlash ( lString , aDefaultPathAndFile ) ;
-//        if ( strlen(lString) )
-//        {
-//            strcat(lDialogString, "default location \"") ;
-//            strcat(lDialogString, lString ) ;
-//            strcat(lDialogString , "\" " ) ;
-//        }
-//        getLastName ( lString , aDefaultPathAndFile ) ;
-//        if ( strlen(lString) )
-//        {
-//            strcat(lDialogString, "default name \"") ;
-//            strcat(lDialogString, lString ) ;
-//            strcat(lDialogString , "\" " ) ;
-//        }
-        ")\n"+
-        "on error number -128\n" +
-        "end try\n" +
-"end tell";
-        
+        final StringBuilder applescriptCommand = new StringBuilder (OPEN_START);
 
-        String[] args = { "osascript", "-e", applescriptCommand };
-        
-        
-        /* Create the ProcessBuilder */
-        ProcessBuilder pb = new ProcessBuilder(Arrays.asList (args));
-        pb.redirectErrorStream(true);
+        if (title != null)
+            applescriptCommand.append (String.format ("with prompt \"%s\" ", title));
 
-        StringBuilder result = new StringBuilder ();
-        
-        /* Start the process */
-        Process proc;
-        try
-        {
-            proc = pb.start();
+        if (this.currentDirectory != null)
+            applescriptCommand.append (String.format ("default location \"%s\" ", this.currentDirectory.getAbsolutePath ()));
 
-            /* Read the process's output */
-            String line;             
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    proc.getInputStream()));             
-            while ((line = in.readLine()) != null) {
-                result.append (line);
-            }
+        applescriptCommand.append (OPEN_END);
 
-            /* Clean-up */
-            proc.destroy();
-        }
-        catch (IOException ex)
-        {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-            
-            return null;
-        }
-        
-        final String filename = result.toString ().trim ();
+        final String filename = runApplescript (applescriptCommand.toString ());
         return filename.isEmpty () ? null : new File (filename);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public File selectNewFile (final FileFilter... filters)
+    public File selectNewFile (final String title, final FileFilter... filters) throws IOException
     {
         // TODO Auto-generated method stub
         return null;
@@ -138,5 +72,38 @@ public class NativeMacosFileDialogs implements NativeFileDialogs
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    private static String runApplescript (final String command) throws IOException
+    {
+        final String [] args =
+        {
+            "osascript",
+            "-e",
+            command
+        };
+
+        final ProcessBuilder pb = new ProcessBuilder (Arrays.asList (args));
+        pb.redirectErrorStream (true);
+
+        final StringBuilder result = new StringBuilder ();
+
+        // Start the process
+        final Process proc = pb.start ();
+
+        // Read the process's output
+        try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getInputStream ())))
+        {
+            String line;
+            while ((line = in.readLine ()) != null)
+                result.append (line);
+        }
+        finally
+        {
+            proc.destroy ();
+        }
+
+        return result.toString ().trim ();
     }
 }
