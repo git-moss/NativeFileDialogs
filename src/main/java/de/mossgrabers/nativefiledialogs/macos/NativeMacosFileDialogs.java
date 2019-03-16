@@ -21,8 +21,10 @@ import java.util.Arrays;
  */
 public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
 {
-    private static final String OPEN_START = "tell application \"Finder\"\nActivate\ntry\nPOSIX path of ( choose file name ";
-    private static final String OPEN_END   = ")\non error number -128\nend try\nend tell";
+    private static final String FOLDER_START = "tell application \"Finder\"\nActivate\ntry\nPOSIX path of ( choose folder ";
+    private static final String OPEN_START   = "tell application \"Finder\"\nActivate\ntry\nPOSIX path of ( choose file ";
+    private static final String SAVE_START   = "tell application \"Finder\"\nActivate\ntry\nPOSIX path of ( choose file name ";
+    private static final String END          = ")\non error number -128\nend try\nend tell";
 
     private File                currentDirectory;
 
@@ -50,7 +52,22 @@ public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
         if (this.currentDirectory != null)
             applescriptCommand.append (String.format ("default location \"%s\" ", this.currentDirectory.getAbsolutePath ()));
 
-        applescriptCommand.append (OPEN_END);
+        if (filters.length > 0)
+        {
+            applescriptCommand.append ("of type {\"");
+            applescriptCommand.append (filters[0].getLabel ()) ;
+            applescriptCommand.append ("\"" );
+            final String [] extensions = filters[0].getExtensions ();
+            for (int i = 0 ; i < extensions.length ; i++)
+            {
+                applescriptCommand.append (",\"" ) ;
+                applescriptCommand.append (extensions [i]) ;
+                applescriptCommand.append ("\"" ) ;
+            }
+            applescriptCommand.append ("} " ) ;
+        }
+
+        applescriptCommand.append (END);
 
         final String filename = runApplescript (applescriptCommand.toString ());
         return filename.isEmpty () ? null : new File (filename);
@@ -61,17 +78,37 @@ public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
     @Override
     public File selectNewFile (final String title, final FileFilter... filters) throws IOException
     {
-        // TODO Auto-generated method stub
-        return null;
+        final StringBuilder applescriptCommand = new StringBuilder (SAVE_START);
+
+        if (title != null)
+            applescriptCommand.append (String.format ("with prompt \"%s\" ", title));
+
+        if (this.currentDirectory != null)
+            applescriptCommand.append (String.format ("default location \"%s\" ", this.currentDirectory.getAbsolutePath ()));
+        
+        applescriptCommand.append (END);
+
+        final String filename = runApplescript (applescriptCommand.toString ());
+        return filename.isEmpty () ? null : new File (filename);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public File selectFolder (final String title)
+    public File selectFolder (final String title) throws IOException
     {
-        // TODO Auto-generated method stub
-        return null;
+        final StringBuilder applescriptCommand = new StringBuilder (FOLDER_START);
+
+        if (title != null)
+            applescriptCommand.append (String.format ("with prompt \"%s\" ", title));
+
+        if (this.currentDirectory != null)
+            applescriptCommand.append (String.format ("default location \"%s\" ", this.currentDirectory.getAbsolutePath ()));
+        
+        applescriptCommand.append (END);
+
+        final String filename = runApplescript (applescriptCommand.toString ());
+        return filename.isEmpty () ? null : new File (filename);        
     }
 
 

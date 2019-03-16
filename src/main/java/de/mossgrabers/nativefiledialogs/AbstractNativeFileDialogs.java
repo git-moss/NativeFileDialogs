@@ -27,7 +27,7 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
     @Override
     public File selectFile (FileFilter... filters) throws IOException
     {
-        return this.selectFile ((String) null, (FileFilter []) null);
+        return this.selectFile ((String) null, filters);
     }
 
 
@@ -43,7 +43,7 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
     @Override
     public File selectNewFile (FileFilter... filters) throws IOException
     {
-        return this.selectNewFile ((String) null, (FileFilter []) null);
+        return this.selectNewFile ((String) null, filters);
     }
 
 

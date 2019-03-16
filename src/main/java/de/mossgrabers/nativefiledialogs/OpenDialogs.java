@@ -28,13 +28,13 @@ public class OpenDialogs
         {
             dlgs = NativeFileDialogsFactory.create (null);
 
-            File selectFile = dlgs.selectFolder ();
+            File selectFile = dlgs.selectFolder ("Open folder...");
             System.out.println (selectFile);
 
-            selectFile = dlgs.selectFile ();
+            selectFile = dlgs.selectFile ("Open folder...", new FileFilter ("Shellscript", "sh"));
             System.out.println (selectFile);
 
-            selectFile = dlgs.selectNewFile ();
+            selectFile = dlgs.selectNewFile ("Save...");
             System.out.println (selectFile);
         }
         catch (final PlatformNotSupported | IOException ex)
