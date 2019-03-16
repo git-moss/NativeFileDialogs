@@ -31,7 +31,7 @@ public class OpenDialogs
             File selectFile = dlgs.selectFolder ("Open folder...");
             System.out.println (selectFile);
 
-            selectFile = dlgs.selectFile ("Open folder...", new FileFilter ("Shellscript", "sh"));
+            selectFile = dlgs.selectFile ("Open file...", new FileFilter ("Shellscript", "sh"));
             System.out.println (selectFile);
 
             selectFile = dlgs.selectNewFile ("Save...");

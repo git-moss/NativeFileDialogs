@@ -28,7 +28,6 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
     private static final int MAX_PATH_LENGTH = 4000;
 
     private final String     parentWindowClassName;
-    protected File           currentDirectory;
 
 
     /**
@@ -39,8 +38,7 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
      */
     public NativeWindowsFileDialogs (final File currentDirectory, final String parentWindowClassName)
     {
-        if (currentDirectory != null)
-            this.currentDirectory = currentDirectory.isDirectory () ? currentDirectory : currentDirectory.getParentFile ();
+        super (currentDirectory);
         this.parentWindowClassName = parentWindowClassName;
     }
 
