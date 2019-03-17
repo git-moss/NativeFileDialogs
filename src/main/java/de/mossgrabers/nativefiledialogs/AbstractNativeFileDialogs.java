@@ -92,12 +92,20 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
     {
         final ProcessBuilder pb = new ProcessBuilder (Arrays.asList (args));
 
-        final StringBuilder result = new StringBuilder ();
-
         // Start the process
         final Process proc = pb.start ();
 
         // Read the process's output
+        final StringBuilder error = new StringBuilder ();
+        try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getErrorStream ())))
+        {
+            String line;
+            while ((line = in.readLine ()) != null)
+                error.append (line);
+        }
+
+        // Read the process's output
+        final StringBuilder result = new StringBuilder ();
         try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getInputStream ())))
         {
             String line;
@@ -108,6 +116,10 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
         {
             proc.destroy ();
         }
+
+        final String err = error.toString ().trim ();
+        if (!err.isEmpty ())
+            throw new IOException (err);
 
         return result.toString ().trim ();
     }

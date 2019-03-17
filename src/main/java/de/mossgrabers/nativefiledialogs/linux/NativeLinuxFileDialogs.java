@@ -94,8 +94,6 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
                 params.add (sb.toString ().trim ());
             }
         }
-        // Suppress warnings
-        params.add ("2>/dev/null");
 
         final String result = executeProcess (params.toArray (new String [params.size ()]));
         if (result.isEmpty ())
