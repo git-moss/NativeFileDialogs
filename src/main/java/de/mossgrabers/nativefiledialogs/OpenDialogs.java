@@ -28,13 +28,14 @@ public class OpenDialogs
         {
             dlgs = NativeFileDialogsFactory.create (null);
 
+            dlgs.setCurrentDirectory (new File ("C:\\Privat\\Sounds"));
             File selectFile = dlgs.selectFolder ("Open folder...");
             System.out.println (selectFile);
 
-            selectFile = dlgs.selectFile ("Open file...", new FileFilter ("Shellscript", "sh"));
+            selectFile = dlgs.selectFile ("Open file...", new FileFilter ("Shellscript", "sh"), new FileFilter ("All files", "*"));
             System.out.println (selectFile);
 
-            selectFile = dlgs.selectNewFile ("Save...");
+            selectFile = dlgs.selectNewFile ("Save...", new FileFilter ("Shellscript", "sh"), new FileFilter ("All files", "*"));
             System.out.println (selectFile);
         }
         catch (final PlatformNotSupported | IOException ex)

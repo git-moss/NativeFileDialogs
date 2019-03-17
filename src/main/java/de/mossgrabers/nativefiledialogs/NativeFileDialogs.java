@@ -16,6 +16,14 @@ import java.io.IOException;
 public interface NativeFileDialogs
 {
     /**
+     * Set the curent directory.
+     *
+     * @param currentDirectory The current directory
+     */
+    void setCurrentDirectory (File currentDirectory);
+
+
+    /**
      * Display a dialog for selecting a fil, which should be opened.
      *
      * @return The selected file or null if the dialog was canceled

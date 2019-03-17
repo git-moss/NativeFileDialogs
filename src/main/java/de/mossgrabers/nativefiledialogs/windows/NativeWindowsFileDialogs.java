@@ -6,13 +6,17 @@ package de.mossgrabers.nativefiledialogs.windows;
 
 import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
+import de.mossgrabers.nativefiledialogs.windows.Shell32.BrowseInfoCallback;
 
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Ole32;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinDef.LPARAM;
+import com.sun.jna.platform.win32.WinDef.WPARAM;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +67,18 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
     @Override
     public File selectFolder (final String title)
     {
+        // Listens for callback events from changes within the Folder Chooser
+        final BrowseInfoCallback proc = (wnd, msg, param, lpData) -> {
+            if (msg == Shell32.BFFM_INITIALIZED && this.currentDirectory != null)
+            {
+                final String path = this.currentDirectory.getAbsolutePath ();
+                final Pointer m = new Memory (Native.WCHAR_SIZE * (path.length () + 1));
+                m.setWideString (0, path);
+                User32.INSTANCE.PostMessage (new HWND (wnd), Shell32.BFFM_SETSELECTION, new WPARAM (1), new LPARAM (Pointer.nativeValue (m)));
+            }
+            return 0;
+        };
+
         Ole32.INSTANCE.OleInitialize (null);
         final Shell32.BrowseInfo params = new Shell32.BrowseInfo ();
 
@@ -70,6 +86,7 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         params.ulFlags = Shell32.BIF_RETURNONLYFSDIRS | Shell32.BIF_USENEWUI;
         if (title != null)
             params.lpszTitle = title;
+        params.lpfn = proc;
 
         final Pointer pidl = Shell32.SHBrowseForFolder (params);
         if (pidl == null)
@@ -118,7 +135,7 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         params.hwndOwner = this.getParentWindow ();
 
         if (title != null)
-            params.lpstrTitle = title;
+            params.lpstrTitle = new WString (title);
 
         // lpstrFile contains the selection path after the dialog returns. It must be big enough for
         // the path to fit or GetOpenFileName returns an error (FNERR_BUFFERTOOSMALL). MAX_PATH is
@@ -144,7 +161,7 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         if (filters != null && filters.length > 0)
         {
             params.lpstrFilter = new WString (buildFilterString (filters));
-            // TODO create dynamically
+            // Select the first filter
             params.nFilterIndex = 1;
         }
         return params;
@@ -163,16 +180,16 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         final StringBuilder filterStr = new StringBuilder ();
         for (final FileFilter spec: filters)
         {
-            filterStr.append (spec.getLabel ()).append ('\0');
+            final StringBuilder exts = new StringBuilder ();
             final String [] extensions = spec.getExtensions ();
             for (int i = 0; i < extensions.length; i++)
             {
                 if (i > 0)
-                    filterStr.append (';');
-                filterStr.append ("*.").append (extensions[i]);
+                    exts.append (';');
+                exts.append ("*.").append (extensions[i]);
             }
-            filterStr.deleteCharAt (filterStr.length () - 1);
-            filterStr.append ('\0');
+            filterStr.append (spec.getLabel ()).append (" (").append (exts).append (")\0");
+            filterStr.append (exts).append ('\0');
         }
         return filterStr.append ('\0').toString ();
     }

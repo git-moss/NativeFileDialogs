@@ -35,6 +35,14 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
 
     /** {@inheritDoc} */
     @Override
+    public void setCurrentDirectory (final File currentDirectory)
+    {
+        this.currentDirectory = currentDirectory;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public File selectFile () throws IOException
     {
         return this.selectFile ((String) null);

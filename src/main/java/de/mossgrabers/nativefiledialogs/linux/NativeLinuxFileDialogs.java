@@ -93,7 +93,6 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
                     sb.append ("*.").append (extension).append (" ");
                 params.add (sb.toString ().trim ());
             }
-            params.add ("--file-filter=All files | *");
         }
         // Suppress warnings
         params.add ("2>/dev/null");
