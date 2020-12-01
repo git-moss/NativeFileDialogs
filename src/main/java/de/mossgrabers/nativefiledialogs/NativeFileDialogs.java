@@ -16,7 +16,8 @@ import java.io.IOException;
 public interface NativeFileDialogs
 {
     /**
-     * Set the curent directory.
+     * Set the curent directory. Might be as well a file for pre-selection of selectFile and
+     * selectNewFile calls.
      *
      * @param currentDirectory The current directory
      */
@@ -24,7 +25,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be opened.
+     * Display a dialog for selecting a file, which should be opened.
      *
      * @return The selected file or null if the dialog was canceled
      * @throws IOException A problem with the dialog appeared
@@ -33,7 +34,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be opened.
+     * Display a dialog for selecting a file, which should be opened.
      *
      * @param filters Display only the files matching the given filters
      * @return The selected file or null if the dialog was canceled
@@ -43,7 +44,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be opened.
+     * Display a dialog for selecting a file, which should be opened.
      *
      * @param title The title to use for the folder, may be null
      * @param filters Display only the files matching the given filters
@@ -54,7 +55,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be saved.
+     * Display a dialog for selecting a file, which should be saved.
      *
      * @return The selected file or null if the dialog was canceled
      * @throws IOException A problem with the dialog appeared
@@ -63,7 +64,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be saved.
+     * Display a dialog for selecting a file, which should be saved.
      *
      * @param filters Display only the files matching the given filters
      * @return The selected file or null if the dialog was canceled
@@ -73,7 +74,7 @@ public interface NativeFileDialogs
 
 
     /**
-     * Display a dialog for selecting a fil, which should be saved.
+     * Display a dialog for selecting a file, which should be saved.
      *
      * @param title The title to use for the folder, may be null
      * @param filters Display only the files matching the given filters

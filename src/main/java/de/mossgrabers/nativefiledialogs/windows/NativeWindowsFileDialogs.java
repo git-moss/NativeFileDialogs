@@ -33,7 +33,6 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
 
     private final String     parentWindowClassName;
 
-
     /**
      * Creates a new file dialog instance with the initial directory.
      *
@@ -71,8 +70,9 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         final BrowseInfoCallback proc = (wnd, msg, param, lpData) -> {
             if (msg == Shell32.BFFM_INITIALIZED && this.currentDirectory != null)
             {
-                final String path = this.currentDirectory.getAbsolutePath ();
-                final Pointer m = new Memory (Native.WCHAR_SIZE * (path.length () + 1));
+                final File dir = this.currentDirectory.isDirectory () ? this.currentDirectory : this.currentDirectory.getParentFile ();
+                final String path = dir.getAbsolutePath ();
+                final Pointer m = new Memory (Native.WCHAR_SIZE * (long) (path.length () + 1));
                 m.setWideString (0, path);
                 User32.INSTANCE.PostMessage (new HWND (wnd), Shell32.BFFM_SETSELECTION, new WPARAM (1), new LPARAM (Pointer.nativeValue (m)));
             }
@@ -115,9 +115,8 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         final Comdlg32.OpenFileName params = this.configureParameters (title, filters);
         if (open ? Comdlg32.GetOpenFileNameW (params) : Comdlg32.GetSaveFileNameW (params))
         {
-            final File selectedFile = params.getSelectedFile ();
-            this.currentDirectory = selectedFile.getParentFile ();
-            return selectedFile;
+            this.currentDirectory = params.getSelectedFile ();
+            return this.currentDirectory;
         }
 
         final int errCode = Comdlg32.CommDlgExtendedError ();
@@ -156,7 +155,11 @@ public class NativeWindowsFileDialogs extends AbstractNativeFileDialogs
         params.nMaxFile = bufferLength;
 
         if (this.currentDirectory != null)
+        {
             params.lpstrInitialDir = this.currentDirectory.getAbsolutePath ();
+            if (this.currentDirectory.isFile ())
+                params.lpstrFile.setWideString (0, this.currentDirectory.getAbsolutePath ());
+        }
 
         if (filters != null && filters.length > 0)
         {
