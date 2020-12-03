@@ -22,7 +22,6 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
 {
     private static boolean isZenityPresent = false;
 
-
     /**
      * Creates a new file dialog instance with the initial directory.
      *
@@ -62,10 +61,10 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     }
 
 
-    private static File selectFile (final boolean isDirectory, final boolean doSave, final String title, final FileFilter... filters) throws IOException
+    private File selectFile (final boolean isDirectory, final boolean doSave, final String title, final FileFilter... filters) throws IOException
     {
         if (!isZenityPresent)
-            return null;
+            throw new IOException ("Please install zenity from the command line: 'sudo apt install zenity'");
 
         final List<String> params = new ArrayList<> ();
         params.add ("zenity");
@@ -73,6 +72,14 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
 
         if (isDirectory)
             params.add ("--directory");
+
+        if (this.currentDirectory != null && this.currentDirectory.exists ())
+        {
+            File dir = this.currentDirectory;
+            if (isDirectory && dir.isFile ())
+                dir = dir.getParentFile ();
+            params.add (String.format ("--filename=%s", dir.getAbsolutePath ()));
+        }
 
         if (doSave)
         {
