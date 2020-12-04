@@ -126,6 +126,7 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
         }
         catch (final IOException ex)
         {
+            isZenityPresent = false;
             return;
         }
     }

@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -19,7 +21,6 @@ import java.util.Arrays;
 public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
 {
     protected File currentDirectory;
-
 
     /**
      * Constructor.
@@ -92,10 +93,18 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
     {
         final ProcessBuilder pb = new ProcessBuilder (Arrays.asList (args));
 
+        // Fix potential redirections of library, which causes weird errors
+        final String osName = System.getProperty ("os.name");
+        if (osName != null && osName.toLowerCase (Locale.ENGLISH).contains ("linux"))
+        {
+            final Map<String, String> environment = pb.environment ();
+            environment.put ("LD_LIBRARY_PATH", "");
+        }
+
         // Start the process
         final Process proc = pb.start ();
 
-        // Read the process's output
+        // Read the process's error output
         final StringBuilder error = new StringBuilder ();
         try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getErrorStream ())))
         {
