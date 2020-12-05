@@ -105,6 +105,8 @@ public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
         if (this.currentDirectory == null)
             return;
         File dir = this.currentDirectory;
+        if (!dir.exists ())
+            return;
         if (onlyFolder)
             dir = this.currentDirectory.isDirectory () ? this.currentDirectory : this.currentDirectory.getParentFile ();
         applescriptCommand.append (String.format ("default location \"%s\" ", dir.getAbsolutePath ()));
