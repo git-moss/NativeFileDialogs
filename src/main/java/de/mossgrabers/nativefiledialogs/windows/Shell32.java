@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2019
+// (c) 2019-2021
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.nativefiledialogs.windows;
@@ -75,7 +75,6 @@ public class Shell32
      */
     public static final int BFFM_SETSELECTION       = 1024 + 103;
 
-
     /**
      * Displays a dialog box that enables the user to select a Shell folder.
      *
@@ -149,7 +148,6 @@ public class Shell32
          */
         public int                iImage;
 
-
         /** {@inheritDoc} */
         @Override
         protected List<String> getFieldOrder ()
@@ -165,7 +163,7 @@ public class Shell32
     {
         /**
          * The dialog box calls this function when an event occurs.
-         * 
+         *
          * @param hWnd The window handle
          * @param uMsg The message
          * @param lParam The long parameter

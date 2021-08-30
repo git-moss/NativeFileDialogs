@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2019
+// (c) 2019-2021
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.nativefiledialogs.windows;
@@ -247,7 +247,6 @@ public class Comdlg32
         Native.register ("comdlg32");
     }
 
-
     /**
      * Creates an Open dialog box that lets the user specify the drive, directory, and the name of a
      * file or set of files to be opened.
@@ -349,7 +348,7 @@ public class Comdlg32
          * buffer must be NULL if initialization is not necessary. When the GetOpenFileName or
          * GetSaveFileName function returns successfully, this buffer contains the drive designator,
          * path, file name, and extension of the selected file.
-         * 
+         *
          * If the OFN_ALLOWMULTISELECT flag is set and the user selects multiple files, the buffer
          * contains the current directory followed by the file names of the selected files. For
          * Explorer-style dialog boxes, the directory and file name strings are NULL separated, with
@@ -358,7 +357,7 @@ public class Comdlg32
          * You can use the FindFirstFile function to convert between long and short file names. If
          * the user selects only one file, the lpstrFile string does not have a separator between
          * the path and file name.
-         * 
+         *
          * If the buffer is too small, the function returns FALSE and the CommDlgExtendedError
          * function returns FNERR_BUFFERTOOSMALL. In this case, the first two bytes of the lpstrFile
          * buffer contain the required size, in bytes or characters..
@@ -451,7 +450,6 @@ public class Comdlg32
          * dialog box that replaces the default dialog box.
          */
         public Pointer lpTemplateName;
-
 
         /**
          * Constructor.

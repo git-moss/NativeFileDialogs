@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2019
+// (c) 2019-2021
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.nativefiledialogs.linux;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
 {
-    private static boolean isZenityPresent = false;
+    private boolean isZenityPresent = false;
 
     /**
      * Creates a new file dialog instance with the initial directory.
@@ -31,7 +31,7 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     {
         super (currentDirectory);
 
-        detectZenity ();
+        this.detectZenity ();
     }
 
 
@@ -39,7 +39,7 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     @Override
     public File selectFile (final String title, final FileFilter... filters) throws IOException
     {
-        final File file = selectFile (false, false, title, filters);
+        final File file = this.selectFile (false, false, title, filters);
         return file != null && !file.isDirectory () ? file : null;
     }
 
@@ -48,7 +48,7 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     @Override
     public File selectNewFile (final String title, final FileFilter... filters) throws IOException
     {
-        final File file = selectFile (false, true, title, filters);
+        final File file = this.selectFile (false, true, title, filters);
         return file != null && !file.isDirectory () ? file : null;
     }
 
@@ -57,13 +57,13 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     @Override
     public File selectFolder (final String title) throws IOException
     {
-        return selectFile (true, false, title, new FileFilter [0]);
+        return this.selectFile (true, false, title, new FileFilter [0]);
     }
 
 
     private File selectFile (final boolean isDirectory, final boolean doSave, final String title, final FileFilter... filters) throws IOException
     {
-        if (!isZenityPresent)
+        if (!this.isZenityPresent)
             throw new IOException ("Please install zenity from the command line: 'sudo apt install zenity'");
 
         final List<String> params = new ArrayList<> ();
@@ -110,7 +110,7 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     }
 
 
-    private static void detectZenity ()
+    private void detectZenity ()
     {
         try
         {
@@ -122,12 +122,11 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
                 "2>/dev/null"
             });
             if (!result.isEmpty ())
-                isZenityPresent = new File (result).exists ();
+                this.isZenityPresent = new File (result).exists ();
         }
         catch (final IOException ex)
         {
-            isZenityPresent = false;
-            return;
+            this.isZenityPresent = false;
         }
     }
 }
