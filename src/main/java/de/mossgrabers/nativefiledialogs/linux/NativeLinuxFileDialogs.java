@@ -6,6 +6,7 @@ package de.mossgrabers.nativefiledialogs.linux;
 
 import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
+import de.mossgrabers.nativefiledialogs.ProcessResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,11 +103,9 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
             }
         }
 
-        final String result = executeProcess (params.toArray (new String [params.size ()]));
-        if (result.isEmpty ())
-            return null;
-
-        return new File (result);
+        final ProcessResult processResult = executeProcess (params.toArray (new String [params.size ()]));
+        final String result = processResult.getResult ();
+        return result.isEmpty () ? null : new File (result);
     }
 
 
@@ -114,15 +113,11 @@ public class NativeLinuxFileDialogs extends AbstractNativeFileDialogs
     {
         try
         {
-            final String result = executeProcess (new String []
+            this.isZenityPresent = executeProcess (new String []
             {
                 "which",
-                "zenity",
-                // Suppress warnings
-                "2>/dev/null"
-            });
-            if (!result.isEmpty ())
-                this.isZenityPresent = new File (result).exists ();
+                "zenity"
+            }).getExitCode () == 0;
         }
         catch (final IOException ex)
         {

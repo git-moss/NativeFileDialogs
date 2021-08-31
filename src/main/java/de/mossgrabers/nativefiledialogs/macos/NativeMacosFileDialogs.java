@@ -6,6 +6,7 @@ package de.mossgrabers.nativefiledialogs.macos;
 
 import de.mossgrabers.nativefiledialogs.AbstractNativeFileDialogs;
 import de.mossgrabers.nativefiledialogs.FileFilter;
+import de.mossgrabers.nativefiledialogs.ProcessResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,11 +126,17 @@ public class NativeMacosFileDialogs extends AbstractNativeFileDialogs
      */
     private static String runApplescript (final String command) throws IOException
     {
-        return executeProcess (new String []
+        final ProcessResult processResult = executeProcess (new String []
         {
             "osascript",
             "-e",
             command
         });
+
+        final String error = processResult.getError ();
+        if (!error.isEmpty ())
+            throw new IOException (error);
+
+        return processResult.getResult ();
     }
 }

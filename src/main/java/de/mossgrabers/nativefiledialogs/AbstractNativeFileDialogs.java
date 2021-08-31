@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -89,7 +90,7 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
      * @return The read output
      * @throws IOException Could not execute the process
      */
-    protected static String executeProcess (final String [] args) throws IOException
+    protected static ProcessResult executeProcess (final String [] args) throws IOException
     {
         final ProcessBuilder pb = new ProcessBuilder (Arrays.asList (args));
 
@@ -104,32 +105,39 @@ public abstract class AbstractNativeFileDialogs implements NativeFileDialogs
         // Start the process
         final Process proc = pb.start ();
 
-        // Read the process's error output
         final StringBuilder error = new StringBuilder ();
-        try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getErrorStream ())))
-        {
-            String line;
-            while ((line = in.readLine ()) != null)
-                error.append (line);
-        }
-
-        // Read the process's output
         final StringBuilder result = new StringBuilder ();
-        try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getInputStream ())))
+        try
         {
-            String line;
-            while ((line = in.readLine ()) != null)
-                result.append (line);
+            // Read the process's error output
+            try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getErrorStream ())))
+            {
+                String line;
+                while ((line = in.readLine ()) != null)
+                    error.append (line);
+            }
+
+            // Read the process's output
+            try (final BufferedReader in = new BufferedReader (new InputStreamReader (proc.getInputStream ())))
+            {
+                String line;
+                while ((line = in.readLine ()) != null)
+                    result.append (line);
+            }
         }
         finally
         {
             proc.destroy ();
         }
 
-        final String err = error.toString ().trim ();
-        if (!err.isEmpty ())
-            throw new IOException (err);
-
-        return result.toString ().trim ();
+        try
+        {
+            proc.waitFor (5, TimeUnit.SECONDS);
+            return new ProcessResult (result.toString ().trim (), error.toString ().trim (), proc.exitValue ());
+        }
+        catch (final InterruptedException ex)
+        {
+            throw new IOException (ex);
+        }
     }
 }
