@@ -1,2 +1,2 @@
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-12-openj9.jdk/Contents/Home
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home
 mvn clean install
